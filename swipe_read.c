@@ -22,6 +22,14 @@ char *get_swipe_data() {
 	return pointer;
 }
 
+void reset_card(struct card *c) {
+	int i;
+	for (i = 0; i < BUFFER_LEN; i++) {
+		c->name[i] = '\0';
+		c->number[i] = '\0';
+	}
+}
+
 void generate_card(struct card *c, char *data) {
 	int start, end, counter = 0;
 	if (strlen(data) < 10) {
@@ -127,7 +135,21 @@ void write_log(const struct card *c) {
 }
 
 int check_whitelist(const struct card *c) {
-	return 0;
+	FILE *whitelist = fopen("whitelist.txt", "r");
+	char buffer[BUFFER_LEN + 1];
+	char number[ID_LEN + 1];
+	int flag = 0, i = 0;
+	
+	if (c->type != ID) return 0;
+	
+	fgets(buffer, BUFFER_LEN, whitelist);
+	while (!feof(whitelist)) {
+		sscanf(buffer, "%s", number);
+		if (!strcmp(c->number, number)) flag = 1;
+		fgets(buffer, BUFFER_LEN, whitelist); i++;
+	}
+	fclose(whitelist);
+	return flag;
 }
 
 void db_lookup(struct card *c) {

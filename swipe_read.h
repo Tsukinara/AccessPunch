@@ -11,6 +11,9 @@
 #ifndef BUFFER_LEN
 #define BUFFER_LEN 255
 #endif
+#ifndef ID_LEN
+#define ID_LEN 16
+#endif
 
 /* macro to test if x is an integer */
 #define ISINT(x) ((x > 47) && (x < 58))
@@ -32,6 +35,7 @@ void generate_card(struct card *c, char *data);
 void parse_credit(struct card *c, char *data);
 
 void write_log(const struct card *c);
+void reset_card(struct card *c);
 void db_lookup(struct card *c);
 void print_card(const struct card *c);
 int check_whitelist(const struct card *c);
