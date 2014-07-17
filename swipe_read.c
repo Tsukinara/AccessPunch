@@ -131,28 +131,76 @@ void print_card(const struct card *c) {
 }
 
 void write_log(const struct card *c) {
-
+	FILE *log = fopen("history.log", "a");
+	time_t now;
+	now = time(NULL);
+	fprintf(log, "%s", ctime(&now));
+	switch (c->type) {
+		case UNKNOWN:
+			fprintf(log, "Unrecognized card\n\n");
+			break;
+		case ID:
+			fprintf(log, "Student ID card: %s\n%s\n", c->number, c->name);
+			fprintf(log, (check_whitelist(c)?"Access granted\n\n":"Access denied\n\n"));
+			break;
+		case CREDIT:
+			fprintf(log, "Credit card: %s\n%s\n", c->number, c->name);
+			fprintf(log, "Expires %d/%02d/%02d\n\n", c->year, c->month, c->day);
+			break;
+	}
+	fclose(log);
 }
 
 int check_whitelist(const struct card *c) {
 	FILE *whitelist = fopen("whitelist.txt", "r");
-	char buffer[BUFFER_LEN + 1];
-	char number[ID_LEN + 1];
-	int flag = 0, i = 0;
+	char buffer[BUFFER_LEN + 1] = "";
+	char number[ID_LEN + 1] = "";
 	
+	/* only IDs will let you in */
 	if (c->type != ID) return 0;
 	
 	fgets(buffer, BUFFER_LEN, whitelist);
 	while (!feof(whitelist)) {
 		sscanf(buffer, "%s", number);
-		if (!strcmp(c->number, number)) flag = 1;
-		fgets(buffer, BUFFER_LEN, whitelist); i++;
+		if (!strcmp(c->number, number)) {
+			fclose(whitelist);
+			return 1;
+		}
+		fgets(buffer, BUFFER_LEN, whitelist);
 	}
 	fclose(whitelist);
-	return flag;
+	return 0;
 }
 
 void db_lookup(struct card *c) {
+	FILE *database = fopen("database.txt", "r");
+	char buffer[BUFFER_LEN + 1] = "";
+	char number[ID_LEN + 1] = "";
+	
+	/* the database only holds data on IDs */
+	if (c->type != ID) return;
+	
+	fgets(buffer, BUFFER_LEN, database);
+	while (!feof(database)) {
+		/* get number */
+		sscanf(buffer, "%s", number);
+		
+		if (!strcmp(c->number, number)) {
+			/* move pointer to associated name */
+			fgets(c->name, BUFFER_LEN, database);
+			c->name[strlen(c->name) - 1] = '\0';
+			fclose(database);
+			return;
+		} else {
+			fgets(buffer, BUFFER_LEN, database);
+		}
+		
+		/* move on to next number if not found */
+		fgets(buffer, BUFFER_LEN, database);
+	}
+	fclose(database);
+	
+	/* set default name if not found */
 	strcpy(c->name, "No database entry.");
 }
 

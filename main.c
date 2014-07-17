@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]) {
 	char *buffer;
 	Card *card = malloc(sizeof(Card));
-
+	
 	if (!card) {
 		fprintf(stderr, "Error: memory allocation failed\n");
 		return -1;
@@ -32,14 +32,14 @@ int main(int argc, char *argv[]) {
 				break;
 			case CREDIT:
 				printf("\n\nWe thank you for your donation.\n");
-				play_sound("retard.mp3");
+				play_sound("donation.mp3");
 				break;
 			case UNKNOWN:
 				printf("\n\nSorry, card not recognized.\n");
 				play_sound("unrecognized.mp3");
 				break;
 			}
-			/* write_log(card); */
+			write_log(card);
 			free(buffer);
 			reset_card(card);
 		}

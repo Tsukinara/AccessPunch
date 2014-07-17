@@ -6,7 +6,7 @@
 #include <sysexits.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <fcntl.h>
+#include <time.h>
 
 #ifndef BUFFER_LEN
 #define BUFFER_LEN 255
