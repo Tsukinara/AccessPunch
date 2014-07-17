@@ -103,7 +103,23 @@ void play_sound(const char *audio_file) {
 }
 
 void print_card(const struct card *c) {
-
+	printf("\n");
+	switch (c->type) {
+		case UNKNOWN:
+			printf("Card not recognized.\n");
+			break;
+		case ID:
+			printf("Student ID recognized:\n");
+			printf("Card number: %s\n", c->number);
+			printf("Database entry: %s\n", c->name);
+			break;
+		case CREDIT:
+			printf("Credit/debit card recognized:\n");
+			printf("Card number: %s\n", c->number);
+			printf("Name on card: %s\n", c->name);
+			printf("Expires on: %d/%02d/%02d\n", c->year, c->month, c->day);
+			break;
+	}
 }
 
 void write_log(const struct card *c) {
@@ -114,7 +130,7 @@ int check_whitelist(const struct card *c) {
 	return 0;
 }
 
-void db_lookup(const struct card *c) {
-	
+void db_lookup(struct card *c) {
+	strcpy(c->name, "No database entry.");
 }
 

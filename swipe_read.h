@@ -32,7 +32,7 @@ void generate_card(struct card *c, char *data);
 void parse_credit(struct card *c, char *data);
 
 void write_log(const struct card *c);
-void db_lookup(const struct card *c);
+void db_lookup(struct card *c);
 void print_card(const struct card *c);
 int check_whitelist(const struct card *c);
 

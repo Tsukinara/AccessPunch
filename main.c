@@ -1,5 +1,7 @@
 #include "swipe_read.h"
 
+#define TIMEOUT 2
+
 int main(int argc, char *argv[]) {
 	char *buffer;
 	Card *card = malloc(sizeof(Card));
@@ -9,6 +11,7 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
+	system("clear");
 	for (;;) {
 		buffer = get_swipe_data();
 		if (!strcmp(buffer, "exit\n")) {
@@ -16,6 +19,7 @@ int main(int argc, char *argv[]) {
 			return 0;
 		} else {
 			generate_card(card, buffer);
+			print_card(card);
 			/*switch (card->type) {
 			case ID:
 				if (check_whitelist(card)) {
@@ -36,7 +40,8 @@ int main(int argc, char *argv[]) {
 			free(card);
 			card = malloc(sizeof(Card));
 		}
-		/*system("clear");*/
+		sleep(TIMEOUT);
+		system("clear");
 	}
 	return 0;
 }
