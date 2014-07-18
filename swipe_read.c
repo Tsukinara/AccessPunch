@@ -1,5 +1,10 @@
 #include "swipe_read.h"
 
+/*
+ * get_swipe_data: returns the string obtained after swiping a card.
+ * Blocks until a card is swiped.
+ */
+
 char *get_swipe_data() {
 	char buffer[BUFFER_LEN + 1], *pointer;
 	int len;
@@ -22,6 +27,11 @@ char *get_swipe_data() {
 	return pointer;
 }
 
+/*
+ * reset_card: given the card to be reset, sets all string values to null
+ * characters to prevent leftovers from previous writes after strcpy is called.
+ */
+
 void reset_card(struct card *c) {
 	int i;
 	for (i = 0; i < BUFFER_LEN; i++) {
@@ -29,6 +39,11 @@ void reset_card(struct card *c) {
 		c->number[i] = '\0';
 	}
 }
+
+/* 
+ * generate_card: given the raw data and a card structure to write to, this
+ * method handles how to parse the raw data, then parses the data to the card.
+ */
 
 void generate_card(struct card *c, char *data) {
 	int start, end, counter = 0;
@@ -51,6 +66,12 @@ void generate_card(struct card *c, char *data) {
 		parse_credit(c, data);
 	}
 }
+
+/*
+ * parse_credit: given a card structure to parse the data to and the raw
+ * data from the scan, parses the scanned data to human-readable information
+ * and writes it to the card structure.
+ */
 
 void parse_credit(struct card *c, char *data) {
 	int start, end, counter = 0;
@@ -97,6 +118,12 @@ void parse_credit(struct card *c, char *data) {
 	c->day = atoi(dy);
 }
 
+/*
+ * play_sound: given the name of an audio file (MP3 only), the method forks,
+ * and the child plays the sound using mpg123. The parent reaps the child, but
+ * does not block, in case the audio file is long.
+ */
+
 void play_sound(const char *audio_file) {
 	pid_t child_pid;
 	if ((child_pid = fork()) < 0) {
@@ -110,6 +137,10 @@ void play_sound(const char *audio_file) {
 	}
 }
 
+/*
+ * print_card: given a card, prints information about the card to the console.
+ */
+ 
 void print_card(const struct card *c) {
 	printf("\n");
 	switch (c->type) {
@@ -129,6 +160,12 @@ void print_card(const struct card *c) {
 			break;
 	}
 }
+
+/*
+ * write_log: given a card, writes the information about the card into
+ * history.log, along with a timestamp. This file can then be parsed by other
+ * programs to generate nicer looking logs.
+ */
 
 void write_log(const struct card *c) {
 	FILE *log = fopen("history.log", "a");
@@ -151,6 +188,12 @@ void write_log(const struct card *c) {
 	fclose(log);
 }
 
+/*
+ * check_whitelist: given a card structure, if the card is an ID card, this
+ * method checks to see if the magnetic strip number is in the whitelist. If
+ * it is, 1 is returned. 0 is returned in all other cases.
+ */
+
 int check_whitelist(const struct card *c) {
 	FILE *whitelist = fopen("whitelist.txt", "r");
 	char buffer[BUFFER_LEN + 1] = "";
@@ -159,6 +202,7 @@ int check_whitelist(const struct card *c) {
 	/* only IDs will let you in */
 	if (c->type != ID) return 0;
 	
+	/* search through file */
 	fgets(buffer, BUFFER_LEN, whitelist);
 	while (!feof(whitelist)) {
 		sscanf(buffer, "%s", number);
@@ -168,10 +212,19 @@ int check_whitelist(const struct card *c) {
 		}
 		fgets(buffer, BUFFER_LEN, whitelist);
 	}
+	
+	/* close file and return 0 if not found in whitelist */
 	fclose(whitelist);
 	return 0;
 }
 
+/* 
+ * db_lookup: given the card structure, if the card is a student ID card,
+ * looks up the magnetic strip number in the database and tries to match
+ * it with a name. If it finds a name, it sets the name field of the card,
+ * otherwise, it sets it to "No database entry."
+ */
+ 
 void db_lookup(struct card *c) {
 	FILE *database = fopen("database.txt", "r");
 	char buffer[BUFFER_LEN + 1] = "";
@@ -180,6 +233,7 @@ void db_lookup(struct card *c) {
 	/* the database only holds data on IDs */
 	if (c->type != ID) return;
 	
+	/* search through file */
 	fgets(buffer, BUFFER_LEN, database);
 	while (!feof(database)) {
 		/* get number */

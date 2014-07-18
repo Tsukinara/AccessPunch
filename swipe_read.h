@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -7,6 +8,8 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <time.h>
+
+#ifndef SWIPE_READ_H
 
 #ifndef BUFFER_LEN
 #define BUFFER_LEN 255
@@ -39,6 +42,9 @@ void reset_card(struct card *c);
 void db_lookup(struct card *c);
 void print_card(const struct card *c);
 int check_whitelist(const struct card *c);
+
+#define SWIPE_READ_H 1
+#endif
 
 
 

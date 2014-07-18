@@ -2,15 +2,22 @@
 
 #define TIMEOUT 2
 
+/*
+ * main: creates a card object, and infinitely loops through, reading data
+ * to the card object, and then parsing that object.
+ */
+
 int main(int argc, char *argv[]) {
 	char *buffer;
 	Card *card = malloc(sizeof(Card));
 	
+	/* check for malloc failure */
 	if (!card) {
 		fprintf(stderr, "Error: memory allocation failed\n");
 		return -1;
 	}
-
+	
+	/* infinite loop of reading, parsing, and checking */
 	system("clear");
 	for (;;) {
 		buffer = get_swipe_data();
@@ -43,6 +50,8 @@ int main(int argc, char *argv[]) {
 			free(buffer);
 			reset_card(card);
 		}
+		
+		/* wait a bit so we can see any output to console */
 		sleep(TIMEOUT);
 		system("clear");
 	}
