@@ -31,7 +31,7 @@ typedef struct card {
 } Card;
 
 /* swipe method prototypes */
-char *get_swipe_data();
+void get_swipe_data(char *buffer);
 void play_sound(const char *audio_file);
 
 void generate_card(struct card *c, char *data);

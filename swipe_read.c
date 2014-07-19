@@ -5,26 +5,12 @@
  * Blocks until a card is swiped.
  */
 
-char *get_swipe_data() {
-	char buffer[BUFFER_LEN + 1], *pointer;
-	int len;
+void get_swipe_data(char *buffer) {
 	fprintf(stdout, "Waiting for card swipe...\n");
 	fgets(buffer, BUFFER_LEN, stdin);
-	
-	len = strlen(buffer);
-	
-	/* allocate len bytes because newline character gets replaced with \0 */
-	pointer = malloc(len);
-	if (!pointer) {
-		fprintf(stderr, "Error: memory allocation failed\n");
-		exit(0);
-	}
-	
-	memcpy(pointer, buffer, len);
-	
+
 	/* replace newline with \0 */
-	pointer[len] = '\0';
-	return pointer;
+	buffer[strlen(buffer)] = '\0';
 }
 
 /*
@@ -34,6 +20,8 @@ char *get_swipe_data() {
 
 void reset_card(struct card *c) {
 	int i;
+	c->type = UNKNOWN;
+	c->year = 0; c->month = 0; c-> day = 0;
 	for (i = 0; i < BUFFER_LEN; i++) {
 		c->name[i] = '\0';
 		c->number[i] = '\0';
@@ -48,18 +36,24 @@ void reset_card(struct card *c) {
 void generate_card(struct card *c, char *data) {
 	int start, end, counter = 0;
 	if (strlen(data) < 10) {
-		c->type = UNKNOWN;
+		reset_card(c);
 		return;
 	}
 	if (strlen(data) < 25) {
 		/* get card ID */
 		c->type = ID;
-		while (! ISINT(data[counter])) counter++;
+		while (! ISINT(data[counter])) {
+			counter++;
+			if (data[counter] == '\0') { reset_card(c); return; }
+		}
 		start = counter;
-		while (ISINT(data[counter])) counter++;
+		while (ISINT(data[counter])) {
+			if (data[counter] == '\0') { reset_card(c); return; }
+			counter++;
+		}
 		end = counter;
 		memcpy(c->number, data + start, end - start);
-		
+		if (strlen(c->number) != 15) { reset_card(c); return; };
 		/* look up number in database */
 		db_lookup(c);
 	} else {
@@ -79,31 +73,49 @@ void parse_credit(struct card *c, char *data) {
 	
 	/* get credit card number */
 	c->type = CREDIT;
-	while (! ISINT(data[counter])) counter++;
+	while (! ISINT(data[counter])) {
+		counter++;
+		if (data[counter] == '\0') { reset_card(c); return; }
+	}
 	start = counter;
-	while (ISINT(data[counter])) counter++;
+	while (ISINT(data[counter])) {
+		counter++;
+		if (data[counter] == '\0') { reset_card(c); return; }
+	}
 	end = counter;
 	memcpy(c->number, data + start, end - start);
-	c->number[end - start] = '\0';
+	
+	if (strlen(c->number) != 16) { reset_card(c); return; }
 	
 	/* get last name */
-	while (data[counter] != 94) counter++;
+	while (data[counter] != '^') {
+		counter++;
+		if (data[counter] == '\0') { reset_card(c); return; }
+	}
 	start = counter + 1;
-	while (data[counter] != 47) counter++;
+	while (data[counter] != '/') {
+		counter++;
+		if (data[counter] == '\0') { reset_card(c); return; }
+	}
 	end = counter;
 	memcpy(last, data + start, end - start);
 	last[end - start] = '\0';
 	
 	/* get first name */
 	start = counter + 1;
-	while (data[counter] != 94) counter++;
+	while (data[counter] != '^') {
+		counter++;
+		if (data[counter] == '\0') { reset_card(c); return; }
+	}
 	end = counter;
 	memcpy(first, data + start, end - start);
-	first[end - start] = '\0';
-	
+	first[end - start] = '\0';	
 	/* remove trailing whitespace */
 	end = strlen(first) - 1;
-	while (! ISTEXT(first[end])) first[end--] = '\0';
+	while (! ISTEXT(first[end])) {
+		first[end--] = '\0';
+		if (data[counter] == '\0') { reset_card(c); return; }
+	}
 	
 	/* set name in card */
 	sprintf(c->name, "%s, %s", last, first);
