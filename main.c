@@ -34,19 +34,19 @@ int main(int argc, char *argv[]) {
 			case ID:
 				if (check_whitelist(card)) {
 					printf("\n\nAccess granted.\n");
-					/* play_sound("success.mp3"); */
+					play_sound("success.mp3");
 				} else {
 					printf("\n\nAccess denied.\n");
-					/* play_sound("failure.mp3"); */
+					play_sound("failure.mp3");
 				}
 				break;
 			case CREDIT:
 				printf("\n\nWe thank you for your donation.\n");
-				/* play_sound("donation.mp3"); */
+				play_sound("donation.mp3");
 				break;
 			case UNKNOWN:
 				printf("\n\nSorry, card not recognized.\n");
-				/* play_sound("unrecognized.mp3"); */
+				play_sound("unrecognized.mp3");
 				break;
 			}
 			write_log(card);
