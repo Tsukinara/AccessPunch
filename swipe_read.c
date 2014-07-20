@@ -6,11 +6,22 @@
  */
 
 void get_swipe_data(char *buffer) {
+	int i = 0; char c;
+	__fpurge(stdin); fflush(stdin); __fpurge(stdin); fflush(stdin);
 	fprintf(stdout, "Waiting for card swipe...\n");
+	
+	scanf("%c", &c);
+	while (c != '\n') {
+		buffer[i] = c;
+		i++;
+		scanf("%c", &c);
+	}
+	buffer[i] = '\0';
+	/*
 	fgets(buffer, BUFFER_LEN, stdin);
-
-	/* replace newline with \0 */
+	/* replace newline with \0
 	buffer[strlen(buffer)] = '\0';
+	*/
 }
 
 /*

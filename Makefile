@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -ansi -Wall -g -O0 -Wwrite-strings -Wshadow \
+CFLAGS = -std=c99 -Wall -g -O0 -Wwrite-strings -Wshadow \
 	-fstack-protector-all
 PROGS = access_punch
 SANDWICH = me a sandwich

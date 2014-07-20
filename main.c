@@ -22,8 +22,10 @@ int main(int argc, char *argv[]) {
 	/* infinite loop of reading, parsing, and checking */
 	system("clear");
 	for (;;) {
+		/*int stdin_cpy = dup(STDIN_FILENO);
+		dup2(STDIN_FILENO, stdin_cpy);*/
 		get_swipe_data(buffer);
-		if (!strcmp(buffer, "exit\n")) {
+		if (!strcmp(buffer, "exit")) {
 			printf("Exit command received.\n");
 			return 0;
 		} else {
@@ -54,7 +56,8 @@ int main(int argc, char *argv[]) {
 		
 		/* wait a bit so we can see any output to console */
 		sleep(TIMEOUT);
-		
+		/*close(stdin_cpy);
+		dup2(stdin_cpy, STDIN_FILENO);*/
 		system("clear");
 	}
 	free(card);
