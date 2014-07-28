@@ -2,8 +2,6 @@
 
 #define TIMEOUT 2
 
-void fpurge();
-
 /*
  * main: creates a card object, and infinitely loops through, reading data
  * to the card object, and then parsing that object.
