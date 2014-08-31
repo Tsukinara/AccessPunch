@@ -1,4 +1,3 @@
-#include <wiringPi.h>
 #include "swipe_read.h"
 
 #define TIMEOUT 2
@@ -10,6 +9,8 @@
 void write_pins(int i, int g, int d, int m);
 void GPIO_setup();
 void set_lights(char mode);
+
+void digital_write(int pin, int mode);
 int swipe_loop();
 
 /*
@@ -27,7 +28,6 @@ int main(int argc, char *argv[]) {
 	printf("Retrieving most recent files from GitHub...\n");
 	fflush(stdout);
 	system("git pull");
-	system("chown matt *");
 	sleep(TIMEOUT);
 
 	/* clear screen and begin loop */
@@ -95,11 +95,18 @@ int swipe_loop() {
 }
 
 void GPIO_setup() {
-	wiringPiSetup();
-	pinMode(IDLE, OUTPUT);
-	pinMode(GRNT, OUTPUT);
-	pinMode(DENY, OUTPUT);
-	pinMode(MONY, OUTPUT);
+	char *buffer = malloc(BUFFER_LEN);
+	sprintf(buffer, "gpio mode %d OUTPUT", IDLE);
+	system(buffer);
+	sprintf(buffer, "gpio mode %d OUTPUT", GRNT);
+	system(buffer);
+	sprintf(buffer, "gpio mode %d OUTPUT", DENY);
+	system(buffer);
+	sprintf(buffer, "gpio mode %d OUTPUT", MONY);
+	system(buffer); free(buffer);
+
+	/* set lights to idle mode */
+	write_pins(1, 0, 0, 0);
 }
 
 void set_lights(char mode) {
@@ -120,9 +127,20 @@ void set_lights(char mode) {
 }
 
 void write_pins(int i, int g, int d, int m) {
-	digitalWrite(IDLE, (i?HIGH:LOW));
-	digitalWrite(GRNT, (g?HIGH:LOW));
-	digitalWrite(DENY, (d?HIGH:LOW));
-	digitalWrite(MONY, (m?HIGH:LOW));
+	if (i == 1) digital_write(IDLE, i);
+	if (g == 1) digital_write(GRNT, g);
+	if (d == 1) digital_write(DENY, d);
+	if (m == 1) digital_write(MONY, m);
+
+	digital_write(IDLE, i);
+	digital_write(GRNT, g);
+	digital_write(DENY, d);
+	digital_write(MONY, m);
 	return;
+}
+
+void digital_write(int pin, int mode) {
+	char *buffer = malloc(BUFFER_LEN);
+	sprintf(buffer, "gpio write %d %d", pin, mode);
+	system(buffer); free(buffer);
 }
