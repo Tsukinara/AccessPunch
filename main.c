@@ -10,21 +10,33 @@
 int main(int argc, char *argv[]) {
 	char *buffer = malloc(BUFFER_LEN + 1);
 	Card *card = malloc(sizeof(Card));
-	
+
 	/* check for malloc failure */
 	if (!card) {
 		fprintf(stderr, "Error: memory allocation failed\n");
 		return -1;
 	}
-	
+
+	/* get most recent files before running */
+	system("clear");
+	printf("Please wait\n");
+	printf("Retrieving most recent files from GitHub...\n");
+	fflush(stdout);
+	system("git pull");
+	sleep(TIMEOUT);
+
 	/* infinite loop of reading, parsing, and checking */
 	system("clear");
+
 	for (;;) {
-		/*int stdin_cpy = dup(STDIN_FILENO);
-		dup2(STDIN_FILENO, stdin_cpy);*/
 		get_swipe_data(buffer);
 		if (!strcmp(buffer, "exit")) {
 			printf("Exit command received.\n");
+			free(card);
+			free(buffer);
+
+			printf("Copying log to rock (hitsuji down for maintenance)\n");
+			system("scp history.log mattdu@rock.umiacs.umd.edu:~/Documents/");
 			return 0;
 		} else {
 			reset_card(card);
@@ -51,14 +63,11 @@ int main(int argc, char *argv[]) {
 			}
 			write_log(card);
 		}
-		
+
 		/* wait a bit so we can see any output to console */
 		sleep(TIMEOUT);
-		/*close(stdin_cpy);
-		dup2(stdin_cpy, STDIN_FILENO);*/
 		system("clear");
 	}
-	free(card);
-	free(buffer);
+
 	return 0;
 }
