@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -std=c99 -Wall -g -O0 -Wwrite-strings -Wshadow \
 	-fstack-protector-all
+LDFLAGS = -lwiringPi
 PROGS = access_punch
 SANDWICH = me a sandwich
 
@@ -20,7 +21,7 @@ sandwich:
 
 #linking .o files
 access_punch: main.o swipe_read.o
-	$(CC) -o access_punch main.o swipe_read.o
+	$(CC) $(LDFLAGS) -o access_punch main.o swipe_read.o
 
 #creating .o files
 main.o: main.c swipe_read.h
