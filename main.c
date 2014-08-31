@@ -17,15 +17,6 @@ void set_lights(char mode);
  */
 
 int main(int argc, char *argv[]) {
-	char *buffer = malloc(BUFFER_LEN + 1);
-	Card *card = malloc(sizeof(Card));
-
-	/* check for malloc failure */
-	if (!card) {
-		fprintf(stderr, "Error: memory allocation failed\n");
-		return -1;
-	}
-
 	/* set up GPIO */
 	GPIO_setup();
 
@@ -37,9 +28,24 @@ int main(int argc, char *argv[]) {
 	system("git pull");
 	sleep(TIMEOUT);
 
-	/* infinite loop of reading, parsing, and checking */
+	/* clear screen and begin loop */
 	system("clear");
+	swipe_loop();
+	
+	return 0;
+}
 
+void swipe_loop() {
+	char *buffer = malloc(BUFFER_LEN + 1);
+	Card *card = malloc(sizeof(Card));
+
+	/* check for malloc failure */
+	if (!card) {
+		fprintf(stderr, "Error: memory allocation failed\n");
+		return -1;
+	}
+
+	/* infinite loop of reading, parsing, and checking */
 	for (;;) {
 		get_swipe_data(buffer);
 		if (!strcmp(buffer, "exit")) {
@@ -85,8 +91,6 @@ int main(int argc, char *argv[]) {
 		set_lights('i');
 		system("clear");
 	}
-
-	return 0;
 }
 
 void GPIO_setup() {
