@@ -35,6 +35,11 @@ int main(int argc, char *argv[]) {
 	return swipe_loop();
 }
 
+/*
+ * A loop which constantly gets the swipe data and executes commands
+ * according to what the swiped card should do.
+ */
+
 int swipe_loop() {
 	char *buffer = malloc(BUFFER_LEN + 1);
 	Card *card = malloc(sizeof(Card));
