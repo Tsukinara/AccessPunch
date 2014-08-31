@@ -10,6 +10,7 @@
 void write_pins(int i, int g, int d, int m);
 void GPIO_setup();
 void set_lights(char mode);
+int swipe_loop();
 
 /*
  * main: creates a card object, and infinitely loops through, reading data
@@ -26,16 +27,15 @@ int main(int argc, char *argv[]) {
 	printf("Retrieving most recent files from GitHub...\n");
 	fflush(stdout);
 	system("git pull");
+	system("chown matt *");
 	sleep(TIMEOUT);
 
 	/* clear screen and begin loop */
 	system("clear");
-	swipe_loop();
-	
-	return 0;
+	return swipe_loop();
 }
 
-void swipe_loop() {
+int swipe_loop() {
 	char *buffer = malloc(BUFFER_LEN + 1);
 	Card *card = malloc(sizeof(Card));
 
@@ -91,6 +91,7 @@ void swipe_loop() {
 		set_lights('i');
 		system("clear");
 	}
+	return 0;
 }
 
 void GPIO_setup() {
