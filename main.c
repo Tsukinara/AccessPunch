@@ -21,6 +21,7 @@ int swipe_loop();
 int main(int argc, char *argv[]) {
 	/* set up GPIO */
 	GPIO_setup();
+	system("amixer cset numid=1 -- 400");
 
 	/* get most recent files before running */
 	system("clear");
